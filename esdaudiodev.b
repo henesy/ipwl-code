@@ -65,10 +65,11 @@ init(nil : ref Draw->Context, args : list of string)
 	arg = load Arg Arg->PATH;
 	if (arg == nil)
 	{
-		sys->raise(sys->sprint("Could not load %s : %r", Arg->PATH));
+		raise sys->sprint("Could not load %s : %r", Arg->PATH);
 	}
-	arg->init(args);
 
+	arg->init(args);
+	arg->setusage("esdaudiodev [-p port] [-d directory] [-h hostname]");
 
 	pgrp = sys->pctl(sys->NEWPGRP, nil);
 
@@ -76,12 +77,11 @@ init(nil : ref Draw->Context, args : list of string)
 	{
 		case c
 		{
-			'p'	=> port = int arg->arg();
-			'd'	=> binddir = string arg->arg();
-			'h'	=> hostname = string arg->arg();
+			'p'	=> port = int arg->earg();
+			'd'	=> binddir = string arg->earg();
+			'h'	=> hostname = string arg->earg();
              		*	=>
-				usage();
-				exit;
+				arg->usage();
 		}
 	}
 
@@ -196,7 +196,7 @@ ctlworker(chanref : ref sys->FileIO)
 				}
 				else
 				{
-					sys->raise("fail: EsdAudioDev: could not terminate");
+					raise "fail: EsdAudioDev: could not terminate";
 				}
 			}
 
@@ -388,7 +388,7 @@ error(err: string)
 	}
 	else
 	{
-		sys->raise("fail: EsdAudioDev: could not write to ctl file");
+		raise "fail: EsdAudioDev: could not write to ctl file";
 	}
 
 	return;
@@ -411,9 +411,3 @@ min (a, b : int) : int
 	return b;
 }
 
-usage()
-{
-	sys->print("Udsage:\nesdaudiodev [-p port] [-d directory] [-h hostname]\n\n");
-
-	return;
-}

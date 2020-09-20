@@ -58,6 +58,7 @@ init(nil : ref Draw->Context, args : list of string)
 	}
 
 	arg->init(args);
+	arg->setusage("transprob [-s states] [-c col] [-f infile] [-m max]");
 
 	while((c := arg->opt()) != 0)
 	{
@@ -65,7 +66,7 @@ init(nil : ref Draw->Context, args : list of string)
 		{
 			's' =>
 			{
-				tmp := arg->arg();
+				tmp := arg->earg();
 				(nstates, statelist) = sys->tokenize(tmp, ",");
 				states = array [nstates] of int;
 				for (i := 0; i < nstates; i++)
@@ -75,10 +76,10 @@ init(nil : ref Draw->Context, args : list of string)
 				}
 			}
 
-			'c' => column = int arg->arg();
-			'f' => inputfile = arg->arg();
-			'm' => maxtrans = int arg->arg(); 
-			*   => usage();
+			'c' => column = int arg->earg();
+			'f' => inputfile = arg->earg();
+			'm' => maxtrans = int arg->earg(); 
+			*   => arg->usage();
 		}
 	}
 	args = arg->argv();
@@ -161,11 +162,5 @@ idx(state : int) : int
 
 	return 0; # ha!
 }
-
-usage()
-{
-
-}
-
 
 

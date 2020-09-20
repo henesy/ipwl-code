@@ -29,10 +29,10 @@ init(nil : ref Draw->Context, args : list of string)
         math = load Math Math->PATH;
 	if (arg == nil || math == nil)
 	{
-		sys->raise(sys->sprint("Could not load %s : %r", Arg->PATH+"and "+Math->PATH));
+		raise sys->sprint("err: could not load %s : %r", Arg->PATH+"and "+Math->PATH);
 	}
 	arg->init(args);
-
+	arg->setusage("esd [-p port]");
 
 	pgrp = sys->pctl(sys->NEWPGRP, nil);
 
@@ -40,9 +40,9 @@ init(nil : ref Draw->Context, args : list of string)
 	{
 		case c
 		{
-			'p'	=> port = int arg->arg();
+			'p'	=> port = int arg->earg();
              		*	=>
-				usage();
+				arg->usage();
 				exit;
 		}
 	}
@@ -227,16 +227,9 @@ debugprint(s: string)
 	return;
 }
 
-usage()
-{
-	sys->print("Usage:\nesd [-p port]\n\n");
-
-	return;
-}
-
 error(s: string)
 {
-	sys->raise("fail: Esd:: "+s);
+	raise "fail: Esd:: "+s;
 
 	exit;
 }

@@ -30,40 +30,43 @@ Checkerboard : module
 init(nil : ref Draw->Context, args : list of string)
 {
 	rows 			: list of string;
-	inputfile, outputfile 	: string;
-	outfilebuf, infilebuf 	: ref Iobuf;
-	boxwidth, boxheight 	: int = 1;
+	inputfile, outputfile 	: string;			# stdin/stdout by default
+	outfilebuf, infilebuf 	: ref Iobuf;		
+	boxwidth, boxheight 	: int = 1;		# Scalars for height/width
 	nrows, ncols 		: int = 0;
-	logrith, colorldepth	: int = 0;
+	logrith	: int = 0;
+	colorldepth := Draw->CMAP8;
 	colorfactor		:= Draw->Black;
 
 
-	sys 	= load Sys Sys->PATH;
+	sys 		= load Sys Sys->PATH;
 	draw 	= load Draw Draw->PATH;
-	img 	= load WImagefile WImagefile->WRITEGIFPATH;
+	img 		= load WImagefile WImagefile->WRITEGIFPATH;
 	bufio 	= load Bufio Bufio->PATH;
-	arg 	= load Arg Arg->PATH;
+	arg 		= load Arg Arg->PATH;
 	math	= load Math Math->PATH;
 
 	arg->init(args);
+	arg->setusage("cb [-c] [-l] [-i infile] [-o outfile] [-w boxwidth] [-h boxheight]");
+
 	img->init(bufio);
 
 	while((c := arg->opt()) != 0)
 	{
 		case c
 		{
-			'i' => inputfile = arg->arg();
-			'o' => outputfile = arg->arg();
-			'w' => boxwidth = int arg->arg();
-			'h' => boxheight = int arg->arg();
-			'c' => colorfactor = 1; colorldepth = 3;
+			'i' => inputfile = arg->earg();
+			'o' => outputfile = arg->earg();
+			'w' => boxwidth = int arg->earg();
+			'h' => boxheight = int arg->earg();
+			'c' => colorfactor = 1; colorldepth = Draw->RGB24;
 			'l' => logrith = 1;
-			*   => usage();
+			*   => arg->usage();
 		}
 	}
 	if (arg->argv() != nil)
 	{
-		usage();
+		arg->usage();
 	}
 
 
@@ -98,8 +101,16 @@ init(nil : ref Draw->Context, args : list of string)
 	#		Draw the boxes:
 	ZP := Point(0, 0);
 	display := Display.allocate(nil);
-	outimage := display.newimage(Rect(ZP, (ncols*boxwidth, nrows*boxheight)), 
-			colorldepth, 0, Draw->White);
+
+	outimage := display.newimage(
+				Rect(
+					ZP, 
+					(ncols*boxwidth, nrows*boxheight)
+				),  
+				colorldepth, 
+				0, 
+				Draw->White
+			);
 
 	for (i := 0; i < nrows; i++)
 	{
@@ -158,13 +169,6 @@ init(nil : ref Draw->Context, args : list of string)
 	
 
 	return;
-}
-
-usage()
-{
-	sys->fprint(sys->fildes(2),
-		"Usage: cb [-c] [-l] [-i infile] [-o outfile] [-w boxwidth] [-h boxheight]\n");
-	exit;
 }
 
 max(a, b : int) : int

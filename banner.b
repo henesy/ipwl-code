@@ -5,11 +5,15 @@
 implement Banner;
 
 include "sys.m";
-include "draw.m";
-include "arg.m";
+	sys : Sys;
 
-sys : Sys;
-arg : Arg;
+include "draw.m";
+
+include "arg.m";
+	arg : Arg;
+
+include "string.m";
+	str: String;
 
 bitmaps := array [] of 
 	{
@@ -1546,36 +1550,39 @@ init(nil : ref Draw->Context, args : list of string)
 
 	sys = load Sys Sys->PATH;
 	arg = load Arg Arg->PATH;
+	str = load String String->PATH;
 
 	arg->init(args);
+	arg->setusage("banner [-b] strings");
 
 	while((c := arg->opt()) != 0)
 	{
 		case c
 		{
 			'b' => bitmap = 1;
-			*   => usage();
+			*   => arg->usage();
 		}
 	}
 	args = arg->argv();
 	
+	# 8x12 bitmaps
 	while (args != nil)
 	{
-		word := hd args;
-		for (i := 0; i < 12; i++)
+		word := str->toupper(hd args);
+
+		for (y := 0; y < 12; y++)
 		{
 			for (n := 0; n < len word; n++)
 			{
-				for (j := 0; j < 8; j++)
+				for (x := 0; x < 8; x++)
 				{
 					if (bitmap)
 					{
-						sys->print("%d ",
-							bitmaps[word[n]][i][j]);					
+						sys->print("%d ", bitmaps[word[n]][y][x]);					
 					}
 					else
 					{
-						if (bitmaps[word[n]][i][j] == 0)
+						if (bitmaps[word[n]][y][x] == 0)
 							sys->print(" ");
 						else
 							sys->print("#");
@@ -1587,10 +1594,4 @@ init(nil : ref Draw->Context, args : list of string)
 
 		args = tl args;
 	}
-}
-
-usage()
-{
-	sys->print("Usage: banner [-b] strings\n");
-	exit;
 }

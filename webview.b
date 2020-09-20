@@ -1,17 +1,21 @@
 implement WebView;
 
 include "sys.m";
+	sys	: Sys;
+	FD: import sys;
+
 include "draw.m";
+
 include "url.m";
+	url	: Url;
+	ParsedUrl: import url;
+
 include "html.m";
 include	"arg.m";
 include "string.m";
 
-ParsedUrl : import url;
 
-sys	: Sys;
 webgrab	: Webgrab;
-url	: Url;
 str	: String;
 html	: HTML;
 arg	: Arg;
@@ -24,13 +28,21 @@ WebView : module
 	init : fn(ctxt : ref Draw->Context, args : list of string);
 };
 
-Webgrab : module
+#Webgrab : module
+#{
+#	init : fn(ctxt : ref Draw->Context, args : list of string);
+#	httpget : fn(u: ref Url->ParsedUrl) : 
+#		(string, array of byte, ref Sys->FD, ref Url->ParsedUrl);
+#	readconfig : fn();
+#};
+
+Webgrab: module
 {
-	init : fn(ctxt : ref Draw->Context, args : list of string);
-	httpget : fn(u: ref Url->ParsedUrl) : 
-		(string, array of byte, ref Sys->FD, ref Url->ParsedUrl);
-	readconfig : fn();
+	init: fn(ctxt: ref Draw->Context, args: list of string);
+	httpget: fn(u: ref ParsedUrl) : (string, array of byte, ref Sys->FD, ref ParsedUrl);
+	readconfig: fn();
 };
+
 
 init(ctxt : ref Draw->Context, args : list of string)
 {
@@ -45,7 +57,7 @@ init(ctxt : ref Draw->Context, args : list of string)
 		cs := load WebView "/dis/lib/cs.dis";
 		if (cs == nil)
 		{
-			sys->raise(sys->sprint("Could not load /dis/lib/cs.dis : %r"));
+			raise sys->sprint("Could not load /dis/lib/cs.dis : %r");
 		}
 		cs->init(nil, nil);
 	}
@@ -53,34 +65,34 @@ init(ctxt : ref Draw->Context, args : list of string)
 	webgrab = load Webgrab "/dis/webgrab.dis";
 	if (webgrab == nil)
 	{
-		sys->raise(sys->sprint("Could not load /dis/webgrab.dis : %r"));
+		raise sys->sprint("Could not load /dis/webgrab.dis : %r");
 	}
-	webgrab->init(nil, "init"::nil);
+	webgrab->init(ctxt, "init"::nil);
 	webgrab->readconfig();
 
 	str = load String String->PATH;
 	if (str == nil)
 	{
-		sys->raise(sys->sprint("Could not load %s : %r", String->PATH));
+		raise sys->sprint("Could not load %s : %r", String->PATH);
 	}
 
 	html = load HTML HTML->PATH;
 	if (html == nil)
 	{
-		sys->raise(sys->sprint("Could not load %s : %r", HTML->PATH));
+		raise sys->sprint("Could not load %s : %r", HTML->PATH);
 	}
 
 	url = load Url Url->PATH;
 	if (url == nil)
 	{
-		sys->raise(sys->sprint("Could not load %s : %r", Url->PATH));
+		raise sys->sprint("Could not load %s : %r", Url->PATH);
 	}
 	url->init();
 
 	arg = load Arg Arg->PATH;
 	if (arg == nil)
 	{
-		sys->raise(sys->sprint("Could not load %s : %r", Arg->PATH));
+		raise sys->sprint("Could not load %s : %r", Arg->PATH);
 	}
 	arg->init(args);
 
@@ -91,7 +103,7 @@ init(ctxt : ref Draw->Context, args : list of string)
 			'd' => debug = 1;
              		*   =>
 			{
-				sys->print("Usage : webview [-d] <URIs>\n");
+				sys->print("usage : webview [-d] <URIs>\n");
 				exit;
 			}
 		}
@@ -189,7 +201,7 @@ htmltxtprint(s : string)
 			strlen := len text;
 			if ((index + strlen) >= FMTWIDTH)
 			{
-				(n, sl) := sys->tokenize(text, " \t");
+				(nil, sl) := sys->tokenize(text, " \t");
 				while (sl != nil)
 				{
 					index += len (hd sl);
