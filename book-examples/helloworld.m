@@ -6,5 +6,5 @@
 #
 HelloWorld : module
 {
-	init : fn(ctxt: ref Draw->Context, args : list of string);
+	init : fn(nil: ref Draw->Context, nil: list of string);
 };

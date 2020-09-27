@@ -21,7 +21,7 @@ init(nil, nil : array of ref Sys->FD)
 	styx = load Styx Styx->PATH;
 	if (styx == nil)
 	{
-		sys->raise(sys->sprint("fail:Could not load %s : %r", Styx->PATH));
+		raise sys->sprint("fail:Could not load %s : %r", Styx->PATH);
 	}
 
 	filtername = "Print Filter : Print Styx messages in filter pipeline.";

@@ -66,8 +66,7 @@ init(ctxt : ref Draw->Context, nil : list of string)
 		display = Display.allocate(nil);
 		if (display == nil)
 		{
-			sys->raise(sys->sprint(
-				"fail:Cannot initialize display : %r"));
+			raise sys->sprint("fail:Cannot initialize display : %r");
 		}
 	}
 	else
@@ -96,8 +95,7 @@ init(ctxt : ref Draw->Context, nil : list of string)
 			display.rgb(147, 221, 0), 1);
 	if (gamescreen == nil)
 	{
-		sys->raise(sys->sprint(
-			"fail:Cannot allocate gamescreen on display : %r"));
+		raise sys->sprint("fail:Cannot allocate gamescreen on display : %r");
 	}
 
 	#	Paint the display black
@@ -307,13 +305,12 @@ kbd(kbdchan : chan of int)
 	kfd := sys->open("/dev/keyboard", sys->OREAD);
 	if (kfd == nil)
 	{
-		sys->raise(sys->sprint("fail:Could not open /dev/cons : %r"));
+		raise sys->sprint("fail:Could not open /dev/cons : %r");
 	}
 
 	while (sys->read(kfd, buf, 1) == 1)
 	{
 		kbdchan <-= int buf[0];
 	}
-	sys->raise(sys->sprint(
-		"fail:Could not read from /dev/cons or ctxt.ckbd: %r"));
+	raise sys->sprint("fail:Could not read from /dev/cons or ctxt.ckbd: %r");
 }

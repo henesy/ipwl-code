@@ -80,7 +80,7 @@ init(nil : ref Draw->Context, args : list of string)
 
 	if (sys->mount(styxpipe[1], mntpt, mntflg, nil) < 0)
 	{
-		sys->raise(sys->sprint("fail:StyxServer mount failed : %r"));
+		raise sys->sprint("fail:StyxServer mount failed : %r");
 	}
 }
 
@@ -102,8 +102,7 @@ server(tmsgchan : chan of ref Styxlib->Tmsg, srv : ref Styxserver,
 		{
 			Readerror =>
 			{
-				sys->raise(sys->sprint(
-					"fail:Styxserver error reading Styx pipe : %r"));
+				raise sys->sprint("fail:Styxserver error reading Styx pipe : %r");
 			}
 
 			Nop	=>	srv.reply(ref Rmsg.Nop(m.tag));
